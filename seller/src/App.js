@@ -14,7 +14,7 @@ import Navbar from "./Navbar";
 import ProductForm from "./ProductForm";
 import ProductList from "./ProductList";
 
-const backendUrl = "http://localhost:4000/api/seller/product";
+const backendUrl = "https://femcloudfinal2025.onrender.com/api/seller/product";
 
 const ProtectedRoute = ({ token }) => {
   const location = useLocation();
@@ -40,7 +40,6 @@ const App = () => {
     whatsappNumber: "",
   });
 
-  // Debug sellerId on component mount
   useEffect(() => {
     console.log("Current sellerId:", sellerId);
     console.log("Current token:", token);
@@ -142,26 +141,21 @@ const App = () => {
       console.log("Submitting product data...");
       console.log("Current sellerId:", sellerId);
       
-      // Validate sellerId
       if (!sellerId || sellerId === "undefined") {
         alert("Error: Invalid seller ID. Please log in again.");
         return;
       }
 
-      // Create a clean FormData to avoid duplicate fields
       const cleanFormData = new FormData();
       
-      // Add all non-seller fields from the original formData
       for (let [key, value] of formData.entries()) {
         if (key !== "sellerId" && key !== "seller") {
           cleanFormData.append(key, value);
         }
       }
       
-      // Add sellerId ONLY ONCE - use "sellerId" as that's what backend expects
       cleanFormData.append("sellerId", sellerId);
 
-      // If editing, include the product ID
       if (editingIndex !== null && editingProductId) {
         cleanFormData.append("id", editingProductId);
       }
@@ -178,13 +172,11 @@ const App = () => {
       const response = await axios.post(url, cleanFormData, {
         headers: { 
           Authorization: `Bearer ${token}`,
-          // Let axios set the Content-Type for FormData automatically
         },
       });
 
       console.log("Product saved successfully:", response.data);
       
-      // Reset form and editing state
       setEditingIndex(null);
       setEditingProductId(null);
       setForm({
@@ -195,7 +187,6 @@ const App = () => {
         whatsappNumber: "",
       });
       
-      // Refresh products list
       fetchProducts();
       
       alert(editingIndex !== null ? "Product updated successfully!" : "Product added successfully!");
@@ -203,7 +194,6 @@ const App = () => {
       console.error("Product save failed:", error);
       console.error("Error response:", error.response?.data);
       
-      // More specific error messages
       if (error.response?.data?.errors) {
         alert(`Validation Error: ${JSON.stringify(error.response.data.errors)}`);
       } else if (error.response?.data?.message) {
